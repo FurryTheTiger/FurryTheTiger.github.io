@@ -1,0 +1,129 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>迷宮生成器</title>
+    <style>
+        .cell {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border: 1px solid black;
+            text-align: center;
+        }
+        .wall {
+            background-color: black;
+        }
+        .path {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body><center>
+<div id="maze"></div>
+<p id="start"></p>
+<p id="exit"></p>
+迷宮寬度：<input id="width" size = "2"><br>
+迷宮寬度：<input id="height" size = "2"><br>
+<br>
+<input onclick="gen_click()" type="submit" value="生成">
+<script>
+var directions = [[-1,0],
+				[1,0],
+				[0,-1],
+				[0,1]]
+function shuffle(array) {
+	array.sort(() => Math.random() - 0.5);
+}
+class Maze{
+  constructor(width,height){
+    this.width = width;
+    this.height = height;
+	this.map = [];
+	for (let i=0;i<(height*2+1);i++){
+		let row = [];
+		for (let j=0;j<(width*2+1);j++){
+		row [j] = 1;
+		}
+		this.map[i]=row;
+	}
+	let x = Math.floor((Math.random()*height)+1)*2-1;
+	let y = Math.floor((Math.random()*width)+1)*2-1;
+    this.start = [x,y];
+    let path = [];
+    path.push(this.start);
+    let exit_list = [];
+	let dead_end = false;
+	let find_path = false;
+    while (path.length > 0){
+      this.map[x][y] = 0;
+      let ran_dir = [...directions];
+      shuffle(ran_dir);
+	  find_path = false;
+      for (let dir of ran_dir){
+        if (0 < x+dir[0]*2 && x+dir[0]*2 < height*2 && 0 < y+dir[1]*2 && y+dir[1]*2 < width*2){
+          if (this.map[x+dir[0]*2][y+dir[1]*2] == 1){
+            this.map[x+dir[0]][y+dir[1]] = 0;
+			x = x+dir[0]*2;
+			y = y+dir[1]*2;
+            path.push([x,y]);
+            dead_end = true;
+			find_path = true;
+            break;
+			}
+			}
+			}
+	  if (!find_path){
+	  	exit_list.push([x,y]);
+	  	dead_end = false;
+	  	path.pop();
+	  	x=path[path.length-1][0];
+	  	y=path[path.length-1][1];
+		if (path.length == 1){
+		break;
+		}
+			}
+	}
+	this.exit = exit_list[Math.floor(Math.random()*exit_list.length)];
+	}
+	Myprint(){
+      for (var i=0;i<this.map.length;i++){
+	  document.write(this.map[i],"<br>");
+        }
+	}
+	pprint(){
+	let mazeDiv = document.getElementById("maze");
+	for (let i = 0; i < this.map.length; i++) {
+            for (let j = 0; j < this.map[i].length; j++) {
+                let cell = document.createElement("div");
+                cell.classList.add("cell");
+                if (this.map[i][j] === 1) {
+                    cell.classList.add("wall");
+                }
+                mazeDiv.appendChild(cell);
+            }
+            mazeDiv.appendChild(document.createElement("br"));
+        }
+	}
+}
+function gen_click(){
+	let width = document.getElementById("width").value;
+	let height = document.getElementById("height").value;
+	width = parseInt(width);
+	height = parseInt(height);
+	if (Number.isInteger(width) && Number.isInteger(height) && width>0 && height>0){
+	var MyMaze = new Maze(width,height);
+	//清除畫面
+	document.getElementById("maze").innerHTML = "";
+	//起點和終點
+	document.getElementById("start").innerHTML = "起點：(" + MyMaze.start + ")";
+	document.getElementById("exit").innerHTML = "終點：(" + MyMaze.exit + ")";
+	//列印迷宮
+	MyMaze.pprint();
+	}
+	else{
+	window.alert("請輸入正整數");
+	}
+}
+</script>
+</center></body>
+</html>
