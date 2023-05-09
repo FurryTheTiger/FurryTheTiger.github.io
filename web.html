@@ -16,6 +16,15 @@
         .path {
             background-color: lightblue;
         }
+		.dead_end {
+			background-color: red;
+		}
+		.start {
+			background-color: yellow;
+		}
+		.exit {
+			background-color: purple;
+		}
     </style>
 </head>
 <body><center>
@@ -50,7 +59,7 @@ class Maze{
 	let y = Math.floor((Math.random()*width)+1)*2-1;
     this.start = [x,y];
     let path = [];
-    path.push(this.start);
+    path.push(this.start);//path.append(self.start)
     let exit_list = [];
 	let dead_end = false;
 	let find_path = false;
@@ -59,7 +68,7 @@ class Maze{
       let ran_dir = [...directions];
       shuffle(ran_dir);
 	  find_path = false;
-      for (let dir of ran_dir){
+      for (let dir of ran_dir){ //for dir in ran_dir :
         if (0 < x+dir[0]*2 && x+dir[0]*2 < height*2 && 0 < y+dir[1]*2 && y+dir[1]*2 < width*2){
           if (this.map[x+dir[0]*2][y+dir[1]*2] == 1){
             this.map[x+dir[0]][y+dir[1]] = 0;
@@ -78,7 +87,7 @@ class Maze{
 	  	path.pop();
 	  	x=path[path.length-1][0];
 	  	y=path[path.length-1][1];
-		if (path.length == 1){
+		if (path.length == 1){ //len(path)
 		break;
 		}
 			}
@@ -95,14 +104,61 @@ class Maze{
 	for (let i = 0; i < this.map.length; i++) {
             for (let j = 0; j < this.map[i].length; j++) {
                 let cell = document.createElement("div");
+				cell.id = `${i},${j}`;
                 cell.classList.add("cell");
                 if (this.map[i][j] === 1) {
                     cell.classList.add("wall");
+                }
+				if (this.map[i][j] === 2) {
+                    cell.classList.add("path");
+                }
+				if (this.map[i][j] === 3) {
+                    cell.classList.add("dead_end");
                 }
                 mazeDiv.appendChild(cell);
             }
             mazeDiv.appendChild(document.createElement("br"));
         }
+	}
+	maze_solve_old(){
+	let maze = [...this.map];
+	let dirs = [...directions];
+	let x = this.start[0];
+	let y = this.start[1];
+	maze[x][y] = 2;
+	this.path = [];
+	this.path_all = [];
+	let step = 0;
+	this.path.push([x,y]);
+	this.path_all.push([[x,y],4]);
+	while (this.path.length>0){
+		if (x == this.exit[0] && y == this.exit[1]){
+			return step;
+			}
+		let find_path = false;
+		for (let dir of dirs){
+			if (maze[x+dir[0]][y+dir[1]]==0){
+				x += dir[0];
+				y += dir[1];
+				this.path.push([x,y]);
+				this.path_all.push([[x,y],2]);
+				maze[x][y] = 2;
+				find_path = true;
+				break;
+				}			
+			}
+		if (!find_path){
+			maze[x][y] = 3;
+			this.path.pop();
+			this.path_all.push([[x,y],3]);
+			x = this.path[this.path.length-1][0];
+			y = this.path[this.path.length-1][1];
+			}
+		step += 1;
+		}
+	if (this.path.length==0){
+		return false;
+	}
 	}
 }
 function gen_click(){
@@ -119,7 +175,35 @@ function gen_click(){
 	document.getElementById("exit").innerHTML = "終點：(" + MyMaze.exit + ")";
 	//列印迷宮
 	MyMaze.pprint();
+	//解迷宮
+	
+	let step = MyMaze.maze_solve_old();
+	/*
+	if (path_ani){
+		clearInterval(path_ani);
 	}
+	*/
+	let exit = document.getElementById(`${MyMaze.exit}`);
+	exit.classList.add("exit");
+	let path_id = 0;
+	let path_ani = setInterval(() => {
+		if (path_id >= MyMaze.path_all.length-1){
+		clearInterval(path_ani);
+		}
+		let cell = document.getElementById(`${MyMaze.path_all[path_id][0]}`);
+		if (MyMaze.path_all[path_id][1]==2){
+			cell.classList.add("path");
+		}
+		if (MyMaze.path_all[path_id][1]==3){
+			cell.classList.add("dead_end");
+		}
+		if (MyMaze.path_all[path_id][1]==4){
+			cell.classList.add("start");
+		}
+		path_id += 1;
+	},100);
+	}
+	
 	else{
 	window.alert("請輸入正整數");
 	}
