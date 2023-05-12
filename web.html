@@ -82,8 +82,10 @@ class Maze{
 			}
 			}
 	  if (!find_path){
-	  	exit_list.push([x,y]);
-	  	dead_end = false;
+		if (dead_end){
+			exit_list.push([x,y]);
+			dead_end = false;
+			}
 	  	path.pop();
 	  	x=path[path.length-1][0];
 	  	y=path[path.length-1][1];
