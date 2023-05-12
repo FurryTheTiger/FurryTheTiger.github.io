@@ -178,15 +178,15 @@ function gen_click(){
 	//解迷宮
 	
 	let step = MyMaze.maze_solve_old();
-	/*
+	
+	let path_ani = null;
 	if (path_ani){
 		clearInterval(path_ani);
 	}
-	*/
 	let exit = document.getElementById(`${MyMaze.exit}`);
 	exit.classList.add("exit");
 	let path_id = 0;
-	let path_ani = setInterval(() => {
+	path_ani = setInterval(() => {
 		if (path_id >= MyMaze.path_all.length-1){
 		clearInterval(path_ani);
 		}
