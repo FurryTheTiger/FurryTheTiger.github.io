@@ -161,6 +161,7 @@ class Maze{
 	}
 	}
 }
+let path_ani = null;
 function gen_click(){
 	let width = document.getElementById("width").value;
 	let height = document.getElementById("height").value;
@@ -170,16 +171,17 @@ function gen_click(){
 	var MyMaze = new Maze(width,height);
 	//清除畫面
 	document.getElementById("maze").innerHTML = "";
+	/*
 	//起點和終點
 	document.getElementById("start").innerHTML = "起點：(" + MyMaze.start + ")";
 	document.getElementById("exit").innerHTML = "終點：(" + MyMaze.exit + ")";
+	*/
 	//列印迷宮
 	MyMaze.pprint();
 	//解迷宮
 	
 	let step = MyMaze.maze_solve_old();
 	
-	let path_ani = null;
 	if (path_ani){
 		clearInterval(path_ani);
 	}
